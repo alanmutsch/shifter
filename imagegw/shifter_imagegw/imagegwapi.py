@@ -174,7 +174,7 @@ def expire(system,type,tag,id):
 
 
 
-if __name__ == '__main__':
+def main():
     if 'GWCONFIG' in os.environ:
         CONFIG=os.environ['GWCONFIG']
     else:
@@ -182,3 +182,6 @@ if __name__ == '__main__':
     init(CONFIG)
 
     imagegwapi.run(debug=DEBUG_FLAG, host='0.0.0.0', port=LISTEN_PORT, threaded=True)
+
+if __name__ == '__main__':
+    main()
