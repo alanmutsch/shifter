@@ -30,41 +30,6 @@ modification, are permitted provided that the following conditions are met:
 See LICENSE for full text.
 """
 
-imagegwapi = Flask(__name__)
-#imagegwapi.debug_log_format= '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-
-imagegwapi.logger.setLevel(logging.INFO)
-ch = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s [%(name)s] %(levelname)s : %(message)s')
-ch.setFormatter(formatter)
-ch.setLevel(logging.DEBUG)
-imagegwapi.logger.addHandler(ch)
-imagegwapi.logger.debug('Initializing image manager')
-
-
-# Default Configuration
-DEBUG_FLAG = True
-LISTEN_PORT = 5000
-AUTH_HEADER='authentication'
-
-
-#
-# Initialization
-mgr=None
-config={}
-#with open(CONFIG) as config_file:
-#    config = json.load(config_file)
-#gr=imagemngr.imagemngr(config,logname='imagegwapi')
-
-def init(configfile):
-    imagegwapi.logger.info("initializing with %s"%(configfile))
-    global mgr
-    global config
-    with open(configfile) as config_file:
-        config = json.load(config_file)
-    mgr=imagemngr.imagemngr(config,logname='imagegwapi')
-    print mgr
-
 
 # For RESTful Service
 @imagegwapi.errorhandler(404)
@@ -175,12 +140,6 @@ def expire(system,type,tag,id):
 
 
 def main():
-    if 'GWCONFIG' in os.environ:
-        CONFIG=os.environ['GWCONFIG']
-    else:
-        CONFIG='%s/imagemanager.json' % (shifter_imagegw.configPath)
-    init(CONFIG)
-
     imagegwapi.run(debug=DEBUG_FLAG, host='0.0.0.0', port=LISTEN_PORT, threaded=True)
 
 if __name__ == '__main__':
