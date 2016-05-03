@@ -18,7 +18,7 @@ modification, are permitted provided that the following conditions are met:
 See LICENSE for full text.
 """
 
-from shifter_imagegwapi import imagegwapi
+import shifter_imagegw
 
 if __name__ == "__main__":
-    iamgegwapi.main()
+    shifter_imagegw.app.run()
