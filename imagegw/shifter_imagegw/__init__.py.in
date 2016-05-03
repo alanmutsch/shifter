@@ -14,8 +14,6 @@ config={}
 
 app = Flask(__name__)
 
-from shifter_imagegw import imagegwapi
-
 def init(configfile):
     from shifter_imagegw import imagemngr
     app.logger.info("initializing with %s"%(configfile))
@@ -26,6 +24,12 @@ def init(configfile):
     mgr=imagemngr.imagemngr(config,logname='imagegwapi')
     print mgr
 
+if 'GWCONFIG' in os.environ:
+    CONFIG=os.environ['GWCONFIG']
+else:
+    CONFIG='%s/imagemanager.json' % (configPath)
+init(CONFIG)
+
 app.logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s [%(name)s] %(levelname)s : %(message)s')
@@ -34,8 +38,4 @@ ch.setLevel(logging.DEBUG)
 app.logger.addHandler(ch)
 app.logger.debug('Initializing image manager')
 
-if 'GWCONFIG' in os.environ:
-    CONFIG=os.environ['GWCONFIG']
-else:
-    CONFIG='%s/imagemanager.json' % (shifter_imagegw.configPath)
-init(CONFIG)
+from shifter_imagegw import imagegwapi

@@ -2,7 +2,7 @@ from celery import Celery
 import json
 import os
 import time
-import shifter_imagegw
+from shifter_imagegw import configPath
 import dockerv2
 import dockerhub
 import converters
@@ -41,7 +41,7 @@ queue = None
 if 'CONFIG' in os.environ:
     CONFIGFILE=os.environ['CONFIG']
 else:
-    CONFIGFILE='%s/imagemanager.json' % (shifter_imagegw.configPath)
+    CONFIGFILE='%s/imagemanager.json' % (configPath)
 
 logging.info("Opening %s"%(CONFIGFILE))
 

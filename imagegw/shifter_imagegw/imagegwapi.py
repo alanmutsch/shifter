@@ -5,7 +5,6 @@ import os
 import sys
 import socket
 import time
-import shifter_imagegw
 from shifter_imagegw import imagemngr
 from shifter_imagegw import app, AUTH_HEADER, mgr
 import logging
