@@ -1,4 +1,4 @@
-SUBDIRS = shifter_imagegw shifter_imagegwapi
+SUBDIRS = shifter_imagegw
 
 pkglibexec_SCRIPTS = imagecli.py \
 			         imagegwapi.py
