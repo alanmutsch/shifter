@@ -1,38 +1,24 @@
+import os
+import json
 import logging
 from flask import Flask, Blueprint, request, Response, url_for, jsonify
-from shifter_imagegw import imagemngr
-
-configPath='@SHIFTER_SYSCONFDIR@'
-
-
-imagegwapi = Flask(__name__)
-#imagegwapi.debug_log_format= '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-
-imagegwapi.logger.setLevel(logging.INFO)
-ch = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s [%(name)s] %(levelname)s : %(message)s')
-ch.setFormatter(formatter)
-ch.setLevel(logging.DEBUG)
-imagegwapi.logger.addHandler(ch)
-imagegwapi.logger.debug('Initializing image manager')
-
 
 # Default Configuration
+configPath='@SHIFTER_SYSCONFDIR@'
 DEBUG_FLAG = True
 LISTEN_PORT = 5000
-AUTH_HEADER='authentication'
-
-
-#
-# Initialization
-mgr=None
+AUTH_HEADER = 'authentication'
+app = None
+mgr = None
 config={}
-#with open(CONFIG) as config_file:
-#    config = json.load(config_file)
-#gr=imagemngr.imagemngr(config,logname='imagegwapi')
+
+app = Flask(__name__)
+
+from shifter_imagegw import imagegwapi
 
 def init(configfile):
-    imagegwapi.logger.info("initializing with %s"%(configfile))
+    from shifter_imagegw import imagemngr
+    app.logger.info("initializing with %s"%(configfile))
     global mgr
     global config
     with open(configfile) as config_file:
@@ -40,6 +26,13 @@ def init(configfile):
     mgr=imagemngr.imagemngr(config,logname='imagegwapi')
     print mgr
 
+app.logger.setLevel(logging.INFO)
+ch = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s [%(name)s] %(levelname)s : %(message)s')
+ch.setFormatter(formatter)
+ch.setLevel(logging.DEBUG)
+app.logger.addHandler(ch)
+app.logger.debug('Initializing image manager')
 
 if 'GWCONFIG' in os.environ:
     CONFIG=os.environ['GWCONFIG']

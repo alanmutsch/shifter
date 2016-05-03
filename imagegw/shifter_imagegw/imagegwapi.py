@@ -7,6 +7,7 @@ import socket
 import time
 import shifter_imagegw
 from shifter_imagegw import imagemngr
+from shifter_imagegw import app, AUTH_HEADER, mgr
 import logging
 from flask import Flask, Blueprint, request, Response, url_for, jsonify
 
@@ -32,9 +33,9 @@ See LICENSE for full text.
 
 
 # For RESTful Service
-@imagegwapi.errorhandler(404)
+@app.errorhandler(404)
 def not_found(error=None):
-    imagegwapi.logger.warning("404 return")
+    app.logger.warning("404 return")
     message = {
             'status': 404,
             'error': str(error),
@@ -44,7 +45,7 @@ def not_found(error=None):
     resp.status_code = 404
     return resp
 
-@imagegwapi.route('/')
+@app.route('/')
 def help():
     return "{lookup,pull,expire}"
 
@@ -59,17 +60,17 @@ def create_response(rec):
 
 # Lookup image
 # This will lookup the status of the requested image.
-@imagegwapi.route('/api/list/<system>/', methods=["GET"])
+@app.route('/api/list/<system>/', methods=["GET"])
 def list(system):
     auth=request.headers.get(AUTH_HEADER)
-    imagegwapi.logger.debug("list system=%s"%(system))
+    app.logger.debug("list system=%s"%(system))
     try:
         session=mgr.new_session(auth,system)
         records=mgr.list(session,system)
         if records==None:
             return not_found('image not found')
     except:
-        imagegwapi.logger.exception('Exception in list')
+        app.logger.exception('Exception in list')
         return not_found('%s'%(sys.exc_value))
     li=[]
     for rec in records:
@@ -80,10 +81,10 @@ def list(system):
 
 # Lookup image
 # This will lookup the status of the requested image.
-@imagegwapi.route('/api/lookup/<system>/<type>/<path:tag>/', methods=["GET"])
+@app.route('/api/lookup/<system>/<type>/<path:tag>/', methods=["GET"])
 def lookup(system,type,tag):
     auth=request.headers.get(AUTH_HEADER)
-    imagegwapi.logger.debug("lookup system=%s type=%s tag=%s auth=%s"%(system,type,tag,auth))
+    app.logger.debug("lookup system=%s type=%s tag=%s auth=%s"%(system,type,tag,auth))
     i={'system':system,'itype':type,'tag':tag}
     try:
         session=mgr.new_session(auth,system)
@@ -91,7 +92,7 @@ def lookup(system,type,tag):
         if rec==None:
             return not_found('image not found')
     except:
-        imagegwapi.logger.exception('Exception in lookup')
+        app.logger.exception('Exception in lookup')
         return not_found('%s %s'%(sys.exc_type,sys.exc_value))
     return jsonify(create_response(rec))
 # {
@@ -109,38 +110,38 @@ def lookup(system,type,tag):
 
 # Pull image
 # This will pull the requested image.
-@imagegwapi.route('/api/pull/<system>/<type>/<path:tag>/', methods=["POST"])
+@app.route('/api/pull/<system>/<type>/<path:tag>/', methods=["POST"])
 def pull(system,type,tag):
     auth=request.headers.get(AUTH_HEADER)
-    imagegwapi.logger.debug("pull system=%s type=%s tag=%s"%(system,type,tag))
+    app.logger.debug("pull system=%s type=%s tag=%s"%(system,type,tag))
     i={'system':system,'itype':type,'tag':tag}
     try:
         session=mgr.new_session(auth,system)
         rec=mgr.pull(session,i)
-        imagegwapi.logger.debug(rec)
+        app.logger.debug(rec)
     except:
-        imagegwapi.logger.exception('Exception in pull')
+        app.logger.exception('Exception in pull')
         return not_found('%s %s'%(sys.exc_type,sys.exc_value))
     return jsonify(create_response(rec))
 
 # expire image
 # This will expire an image which removes it from the cache.
-@imagegwapi.route('/api/expire/<system>/<type>/<tag>/<id>/', methods=["GET"])
+@app.route('/api/expire/<system>/<type>/<tag>/<id>/', methods=["GET"])
 def expire(system,type,tag,id):
     auth=request.headers.get(AUTH_HEADER)
-    imagegwapi.logger.debug("expire system=%s type=%s tag=%s"%(system,type,tag))
+    app.logger.debug("expire system=%s type=%s tag=%s"%(system,type,tag))
     try:
         session=mgr.new_session(auth,system)
         resp=mgr.expire(session,system,type,tag,id)
     except:
-        imagegwapi.logger.exception('Exception in expire')
+        app.logger.exception('Exception in expire')
         return not_found()
     return jsonify(resp)
 
 
 
 def main():
-    imagegwapi.run(debug=DEBUG_FLAG, host='0.0.0.0', port=LISTEN_PORT, threaded=True)
+    app.run(debug=DEBUG_FLAG, host='0.0.0.0', port=LISTEN_PORT, threaded=True)
 
 if __name__ == '__main__':
     main()
