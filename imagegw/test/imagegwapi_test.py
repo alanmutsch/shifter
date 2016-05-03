@@ -31,7 +31,7 @@ AUTH_HEADER='authentication'
 class GWTestCase(unittest.TestCase):
 
     def setUp(self):
-        import imagegwapi
+        import shifter_imagegw.imagegwapi
         self.configfile='test.json'
         with open(self.configfile) as config_file:
             self.config = json.load(config_file)
